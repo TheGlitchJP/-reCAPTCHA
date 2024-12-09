@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reCAPTCHA Lv.495</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .captcha-container {
+            width: 320px;
+            background-color: white;
+            border: 1px solid #dcdcdc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .captcha-header {
+            background-color: #006eff;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            border-bottom: 1px solid #dcdcdc;
+        }
+        .captcha-instructions {
+            padding: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            padding: 5px;
+            background-color: #fff;
+        }
+        .images img {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.2s ease-in-out;
+        }
+        .images img.selected {
+            border: 2px solid #4285f4;
+            border-radius: 4px;
+        }
+        .captcha-footer {
+            padding: 10px;
+            border-top: 1px solid #dcdcdc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .captcha-refresh {
+            font-size: 12px;
+            color: #4285f4;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .submit-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="captcha-container">
+    <div class="captcha-header"><h2>答えがぴったり１になる数式</h2>を全て選択してください。</div>
+    <div class="images"></div>
+    <div class="captcha-footer">
+        <span  class="captcha-refresh" onclick="shuffleImages()";>refresh</span>
+        <button class="submit-btn" disabled>確認</button>
+    </div>
+</div>
+
+<script>
+    const imagesContainer = document.querySelector('.images');
+    const button = document.querySelector('.submit-btn');
+
+    // 固定の画像リスト
+    const imageList = [
+        { src: "img/image1.jpg", correct: true }, // 正解画像
+        { src: "img/image2.jpg", correct: false },
+        { src: "img/image3.jpg", correct: false },
+        { src: "img/image4.jpg", correct: false },
+        { src: "img/image5.jpg", correct: false },
+        { src: "img/image6.jpg", correct: false },
+        { src: "img/image7.jpg", correct: false },
+        { src: "img/image8.jpg", correct: false },
+        { src: "img/image9.jpg", correct: false }
+    ];
+
+    let selectedImages = new Set();
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function shuffleImages() {
+        // 初期化
+        imagesContainer.innerHTML = "";
+        selectedImages.clear();
+        button.disabled = true;
+
+        // 順番をランダムに並べ替え
+        const shuffledImages = [...imageList];
+        shuffle(shuffledImages);
+
+        // グリッドに画像を追加
+        shuffledImages.forEach((imgData, index) => {
+            const img = document.createElement("img");
+            img.src = imgData.src;
+            img.alt = `Option ${index + 1}`;
+            img.dataset.correct = imgData.correct;
+            img.addEventListener('click', () => handleImageClick(img));
+            imagesContainer.appendChild(img);
+        });
+    }
+
+    function handleImageClick(img) {
+        // 選択状態の切り替え
+        const isSelected = img.classList.toggle('selected');
+        if (isSelected) {
+            selectedImages.add(img);
+        } else {
+            selectedImages.delete(img);
+        }
+
+        // ボタンの有効化
+        button.disabled = selectedImages.size === 0;
+    }
+
+    button.addEventListener('click', () => {
+        // 正解判定
+        const isCorrect = [...selectedImages].length === 1 && [...selectedImages][0].dataset.correct === "true";
+        if (isCorrect) {
+            alert('Verification Successful!');
+        } else {
+            alert('Verification Failed. Please try again.');
+        }
+    });
+
+    // 初回表示
+    shuffleImages();
+</script>
+
+</body>
+</html>
